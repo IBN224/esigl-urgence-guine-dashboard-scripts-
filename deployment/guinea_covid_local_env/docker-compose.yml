@@ -239,7 +239,7 @@ volumes:
   syslog:
     external: false
   pg-data:
-    external: false
+    external: true
   nginx-log:
     external: false
   auth-tomcat-log:
