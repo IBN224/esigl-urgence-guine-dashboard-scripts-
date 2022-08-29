@@ -1,8 +1,11 @@
 stages:
-  - deploy_local
+  - deploy
 
-deploy_uat:
-  stage: deploy_local
+deploy_app_production:
+  stage: deploy
+  rules:
+    - if: '$CI_COMMIT_REF_NAME == "master"'
+    - when: manual
   tags:
     - guinea-local-app-runner
 
