@@ -1,0 +1,12 @@
+tmp/
+.idea/
+.terraform/
+*.swp
+*.swo
+
+*.pyc
+venv/
+
+.DS_Store
+settings.env
+*.pem

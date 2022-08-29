@@ -1,0 +1,12 @@
+stages:
+  - deploy_local
+
+deploy_uat:
+  stage: deploy_local
+  tags:
+    - guinea-local-app-runner
+
+  script:
+    - cd deployment/guinea_covid_local_env/
+    - cat $SETTINGS > settings.env
+    - ./deploy_to_env.sh
