@@ -3,7 +3,7 @@ services:
 
   reverse-proxy:
     restart: always
-    image: 'traefik:v2.3'
+    image: 'traefik:v2.8.3'
     container_name: 'reverse-proxy'
     command:
       - '--api.insecure=true'
@@ -38,6 +38,7 @@ services:
       - "53"
 
   nginx:
+    restart: always
     image: openlmis/nginx:${OL_NGINX_VERSION}
     env_file: settings.env
     environment:
@@ -218,12 +219,14 @@ services:
   #      - 'auth-tomcat-log:/var/log/auth-tomcat'
 
   service-configuration:
+    restart: always
     build:
       context: ./config
     volumes:
       - service-config:/config
 
   ftp:
+    restart: always
     image: hauptmedia/proftpd
     ports:
       - "21:21"
@@ -232,6 +235,7 @@ services:
     depends_on: [ consul ]
 
   redis:
+    restart: always
     image: redis:3.2.12
     depends_on: [ consul ]
 
