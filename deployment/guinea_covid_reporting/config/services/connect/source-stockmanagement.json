@@ -1,0 +1,27 @@
+{
+  "name": "source-stockmanagement",
+  "config": {
+    "connector.class": "io.debezium.connector.postgresql.PostgresConnector",
+    "tasks.max": "1",
+    "plugin.name": "wal2json",
+    "database.hostname": "olmis-db",
+    "database.port": "5432",
+    "database.user": "postgres",
+    "database.password": "p@ssw0rd",
+    "database.dbname": "open_lmis",
+    "database.server.name": "openlmis",
+    "table.whitelist": "stockmanagement\\.available_stock_card_fields,stockmanagement\\.available_stock_card_line_item_fields,stockmanagement\\.calculated_stocks_on_hand,stockmanagement\\.nodes,stockmanagement\\.organizations,stockmanagement\\.physical_inventories,stockmanagement\\.physical_inventory_line_item_adjustments,stockmanagement\\.physical_inventory_line_items,stockmanagement\\.stock_card_fields,stockmanagement\\.stock_card_line_item_fields,stockmanagement\\.stock_card_line_item_reason_tags,stockmanagement\\.stock_card_line_item_reasons,stockmanagement\\.stock_card_line_items,stockmanagement\\.stock_cards,stockmanagement\\.stock_cards,stock_event_line_items,stockmanagement\\.stock_cards,stockmanagement\\.stock_events,stockmanagement\\.valid_destination_assignments,stockmanagement\\.valid_reason_assignments,stockmanagement\\.valid_source_assignments",
+    "database.history.kafka.bootstrap.servers": "kafka:29092",
+    "database.history.kafka.topic": "openlmis",
+    "slot.name": "dbz_stockmanagement",
+    "heartbeat.interval.ms": 3000,
+    "heartbeat.action.query": "CREATE TABLE IF NOT EXISTS debezium_heartbeat (id SERIAL PRIMARY KEY, ts TIMESTAMPTZ); INSERT INTO debezium_heartbeat (id, ts) VALUES (1, NOW()) ON CONFLICT(id) DO UPDATE SET ts=NOW();",
+    "transforms": "unwrap,route",
+    "transforms.unwrap.type": "io.debezium.transforms.ExtractNewRecordState",
+    "transforms.unwrap.drop.tombstones": "false",
+    "transforms.unwrap.delete.handling.mode": "none",
+    "transforms.route.type": "org.apache.kafka.connect.transforms.RegexRouter",
+    "transforms.route.regex": "([^.]+)\\.([^.]+)\\.([^.]+)",
+    "transforms.route.replacement": "public.kafka_$3"
+  }
+}
