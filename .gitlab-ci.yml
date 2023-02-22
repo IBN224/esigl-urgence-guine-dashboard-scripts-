@@ -1,5 +1,6 @@
 stages:
   - deploy
+  - deploy_testing
 
 deploy_app_production:
   stage: deploy
