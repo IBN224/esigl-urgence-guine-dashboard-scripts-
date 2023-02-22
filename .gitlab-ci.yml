@@ -3,6 +3,7 @@ stages:
 
 deploy_app_production:
   stage: deploy
+  when: manual
   rules:
     - if: '$CI_COMMIT_REF_NAME == "master"'
     - when: manual
@@ -12,4 +13,18 @@ deploy_app_production:
   script:
     - cd deployment/guinea_covid_local_env/
     - cat $SETTINGS > settings.env
+    - ./deploy_to_env.sh
+
+deploy_app_testing:
+  stage: deploy_testing
+  when: manual
+  rules:
+    - if: '$CI_COMMIT_REF_NAME == "master"'
+    - when: manual
+  tags:
+    - guinea-covid-app-runner
+
+  script:
+    - cd deployment/guinea_covid_uat_env/
+    - cat $SETTINGS_TESTING > settings.env
     - ./deploy_to_env.sh
