@@ -63,7 +63,7 @@ services:
 
   requisition:
     restart: always
-    image: elogistics/guinea-requisition
+    image: openlmis/requisition:${OL_REQUISITION_VERSION}
     env_file: settings.env
     environment:
       JAVA_OPTS: '-server -Xmx2048m -Dspring.datasource.hikari.maximum-pool-size=5 -Dlogging.config=/config/log/logback.xml'
