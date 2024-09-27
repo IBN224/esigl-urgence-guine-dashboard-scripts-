@@ -226,13 +226,14 @@ services:
       - service-config:/config
 
   ftp:
-    restart: always
-    image: hauptmedia/proftpd
+    image: fauria/vsftpd
+    #image: hauptmedia/proftpd
     ports:
       - "21:21"
       - "20:20"
+      - "21100-21110:21100-21110"
     env_file: settings.env
-    depends_on: [ consul ]
+    depends_on: [consul]
 
   redis:
     restart: always
