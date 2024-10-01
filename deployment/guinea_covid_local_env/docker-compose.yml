@@ -57,13 +57,15 @@ services:
 
   covid-ui:
     restart: always
-    image: openlmis/reference-ui:${OL_REFERENCE_UI_VERSION}
+    #image: openlmis/reference-ui:${OL_REFERENCE_UI_VERSION}
+    image: elogistics/guinea-ui:v1
     env_file: settings.env
     depends_on: [ consul ]
 
   requisition:
     restart: always
-    image: openlmis/requisition:${OL_REQUISITION_VERSION}
+    #image: openlmis/requisition:${OL_REQUISITION_VERSION}
+    image: elogistics/guinea-requisition:8.3.7-SNAPSHOT
     env_file: settings.env
     environment:
       JAVA_OPTS: '-server -Xmx2048m -Dspring.datasource.hikari.maximum-pool-size=5 -Dlogging.config=/config/log/logback.xml'
