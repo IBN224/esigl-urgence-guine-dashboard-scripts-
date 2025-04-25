@@ -1,6 +1,0 @@
-name: guinea-reporting-instance
-runtime:
-  name: python
-  options:
-    virtualenv: venv
-description: an environment for guinea covid reporting.
