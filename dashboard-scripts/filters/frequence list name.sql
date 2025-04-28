@@ -19,3 +19,7 @@ FROM (
     ('Trimestrielle'),
     ('Annuelle')
 ) AS periodicities(frequence_name);
+
+
+
+

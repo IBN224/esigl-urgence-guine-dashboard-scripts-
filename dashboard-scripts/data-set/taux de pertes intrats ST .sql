@@ -1,10 +1,5 @@
---Filter columns program_name, period_name and facility_name 
--- 1 program_name is the "SELECT p.name as program_name FROM referencedata.programs p";
 
--- 2 period_name is the "SELECT p.name as period_name from referencedata.processing_periods p"
-
--- 3 facility_name is the "SELECT f.name as facility_name FROM referencedata.facilities f"
-
+/*** Filters to use programs, frequence, year, period, facility et product ***/
 
 
 
@@ -19,7 +14,7 @@
 {% set product_name_list = filter_values('product_name') | default([]) %}
 
 
-{% macro avg_value() %}
+{% macro avg_value() %} --****** case with avg
 ,
 calculated_taux AS (
     SELECT p.program_name as program_name,
@@ -40,14 +35,14 @@ SELECT
     '{{filter_values('period_name')[0]}}' as period_name,                 
     '{{filter_values('year_name')[0]}}' AS year_name,                          
     ROUND((AVG(taux_perte_intrats)), 2) AS taux_perte_intrats, 
-    ROUND((SUM(taux_perte_intrats)), 2) || ' / ' || COUNT(program_name) AS sur -- Summed sur values
+    ROUND((SUM(taux_perte_intrats)), 2) || ' / ' || COUNT(program_name) AS sur -
 FROM 
     calculated_taux   
 {% endmacro %}
  
  
 
-{% macro not_avg_value() %}
+{% macro not_avg_value() %} --****** case without avg
 SELECT p.program_name as program_name,
        p.facility_name AS facility_name,
        p.product_name as product_name,
@@ -91,8 +86,6 @@ SELECT SUM(quantity) as qt_intrats_perdus,
                   							        {% if current_year() == filter_values('year_name')[0] | int and 'Hebdomadaire' == filter_values('frequence_name')[0] %}
                                           DATE_TRUNC('{{ frequ_valu }}', r.createddate) = DATE_TRUNC('{{ frequ_valu }}', CURRENT_DATE) AND
                                         {% endif %}
-                  									    --f.name='CSR KOLABOUI' AND 
-                  									    --o.fullproductname in ('MODERNA', 'SPUTNIK V') AND
                   									    ('{{ filter_values('facility_name', []) | length }}' = 0 OR 
                                          f.name IN ( {{ "'" + "','".join(filter_values('facility_name', ['default_facility1', 'default_facility2'])) + "'" 
                                          if filter_values('facility_name', []) else "'default_facility1','default_facility2'" }}))
@@ -135,7 +128,7 @@ SELECT SUM(i.totalreceivedquantity + i.beginningbalance) as qtt_intrats_recus,
 {% if facility_name_list | length != 0 or product_name_list | length != 0 %}
  {{not_avg_value()}}
 {% else %}
---********** average case *****************
+
 {{avg_value()}}
 
 {% endif %}

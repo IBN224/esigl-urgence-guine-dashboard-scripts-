@@ -1,5 +1,6 @@
 
 WITH nbr_produit_en_rupture AS(
+--nombre de produit en rupture de stock
 WITH max_dates AS (
     SELECT s.lotid,
 		       s.orderableid,
@@ -30,12 +31,6 @@ WITH max_dates AS (
 )
 SELECT COUNT(program_name) as nbre_produits_en_ruptures,
                               program_name as program_name,
-                              -- {% if filter_values('product_name')[0] | default('') != '' %}
-                              --   product_name,
-                              -- {% endif %}
-                              -- {% if filter_values('facility_name')[0] | default('') != '' %}
-                              --   facility_name,
-                              -- {% endif %}
                               'year' as frequence_name
             FROM (
               SELECT SUM(h.stockonhand) as sum_stockonhand,
@@ -56,17 +51,10 @@ SELECT COUNT(program_name) as nbre_produits_en_ruptures,
                 		JOIN stockmanagement.calculated_stocks_on_hand h ON h.id = result_1.stock_id
                 	  GROUP BY result_1.facility_name, result_1.program_name, result_1.product_name) as final_result
 	      WHERE final_result.sum_stockonhand=0
-	      GROUP BY program_name
-        	       --{% if filter_values('product_name')[0] | default('') != '' %}
-                --   , product_name
-                -- {% endif %}
-                -- {% if filter_values('facility_name')[0] | default('') != '' %}
-                --   , facility_name
-                -- {% endif %}
-        	      
-        	      
+	      GROUP BY program_name  
 ),
 nbr_tt_produit AS(
+--nombre total de produit
 SELECT COUNT(DISTINCT o.id) as nbre_tt_produits,
                       'year' AS frequence_name
           FROM referencedata.orderables o JOIN referencedata.program_orderables po ON po.orderableid = o.id
@@ -75,37 +63,9 @@ SELECT COUNT(DISTINCT o.id) as nbre_tt_produits,
 )
 SELECT p.frequence_name as frequence_name,
        p.program_name as program_name,
-        /*CASE 
-            WHEN '{{ filter_values('product_name')[0] | default('') }}' = '' THEN 'NAN'
-            ELSE p.product_name
-        END AS product_name,
-        CASE 
-            WHEN '{{ filter_values('facility_name')[0] | default('') }}' = '' THEN 'NAN'
-            ELSE p.facility_name
-        END AS facility_name,*/
         'NAN' as product_name,
         'NAN' as facility_name,
-        /*{% if filter_values('product_name')[0] | default('') == '' %}
-          'NAN' as product_name,
-        {% endif %}
-        {% if filter_values('product_name')[0] | default('') != '' %}
-          p.product_name as product_name,
-        {% endif %}
-        {% if filter_values('facility_name')[0] | default('') == '' %}
-          'NAN' as facility_name,
-        {% endif %}
-        {% if filter_values('facility_name')[0] | default('') != '' %}
-          p.facility_name as facility_name,
-        {% endif %}*/
        'year' as year_name,
-       /* {% if filter_values('product_name')[0] | default('') != '' or 
-            filter_values('facility_name')[0] | default('') != '' %}
-        ROUND(((p.nbre_produits_en_ruptures::NUMERIC / r.nbre_tt_produits) * 100), 2) AS taux_rupture_stock,
-        {% endif %}
-        {% if filter_values('product_name')[0] | default('') == '' and 
-            filter_values('facility_name')[0] | default('') == '' %}
-        ROUND((p.nbre_produits_en_ruptures::NUMERIC / r.nbre_tt_produits), 2) AS taux_rupture_stock,
-        {% endif %}*/
        ROUND(((p.nbre_produits_en_ruptures::NUMERIC / r.nbre_tt_produits) * 100), 2) AS taux_rupture_stock,
        p.nbre_produits_en_ruptures || ' / ' || r.nbre_tt_produits as sur
       FROM nbr_produit_en_rupture p 

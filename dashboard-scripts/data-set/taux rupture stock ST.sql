@@ -1,20 +1,5 @@
 
---Filter columns product_name, period_name and frequence_name 
--- 1 product_name is the "SELECT o.fullproductname as product_name FROM referencedata.orderables o GROUP BY o.fullproductname";
-
--- 2 period_name is the "SELECT p.name as period_name
---  FROM referencedata.processing_periods p 
---        JOIN referencedata.processing_schedules s ON s.id=p.processingscheduleid
---  WHERE s.code!='Dayly' AND s.code!='Weekly' "
-
--- 3 frequence_name Values are dependent on period_name filter
---   here is the dataset "SELECT p.name as period_name,
---                             s.code as frequence_name
--- 	                   FROM referencedata.processing_periods p 
---                       JOIN referencedata.processing_schedules s ON s.id=p.processingscheduleid
---             		 JOIN (
---             			   SELECT p.startdate as startDate_border, p.enddate as endDate_border FROM referencedata.processing_periods p where p.name='{{filter_values('period_name')[0]}}' -- Jan-Fev,2022
---             			 ) as borderDates ON (borderDates.startDate_border<=p.startdate and borderDates.endDate_border>=p.enddate) "
+/*** Filters to use programs, frequence, year, period, facility et product ***/
 
 
 {% set frequ_valu = (
@@ -28,7 +13,7 @@
 {% set product_name_list = filter_values('product_name') | default([]) %}
 
 
-{% macro avg_value() %}
+{% macro avg_value() %} --****** case with avg
 ,
 calculated_taux AS (
  SELECT np.program_name as program_name,
@@ -58,7 +43,7 @@ FROM
  
  
 
-{% macro not_avg_value() %}
+{% macro not_avg_value() %} --****** case without avg
 SELECT np.program_name as program_name,
        np.facility_name as facility_name,
        np.product_name as product_name,
@@ -95,7 +80,6 @@ WHERE
       {% if current_year() == filter_values('year_name')[0] | int and 'Hebdomadaire' == filter_values('frequence_name')[0] %}
         DATE_TRUNC('{{ frequ_valu }}', r.createddate) = DATE_TRUNC('{{ frequ_valu }}', CURRENT_DATE) AND
       {% endif %}
-      -- and finally if current_year() != 2024 or frequence != day; result is => default
       (r.status='APPROVED' OR r.status='AUTHORIZED') AND
       ('{{ filter_values('facility_name', []) | length }}' = 0 OR 
        f.name IN ( {{ "'" + "','".join(filter_values('facility_name', ['default_facility1', 'default_facility2'])) + "'" 
@@ -119,7 +103,7 @@ SELECT COUNT(DISTINCT o.id) as nbre_tt_produits,
 {% if facility_name_list | length != 0 or product_name_list | length != 0 %}
  {{not_avg_value()}}
 {% else %}
---********** average case *****************
+
 {{avg_value()}}
 
 {% endif %}

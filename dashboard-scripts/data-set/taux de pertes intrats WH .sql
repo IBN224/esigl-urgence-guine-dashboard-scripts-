@@ -1,8 +1,5 @@
---Filter columns program_name and facility_name 
--- 1 program_name is the "SELECT p.name as program_name FROM referencedata.programs p"
 
--- 3 facility_name is the "SELECT f.name as facility_name FROM referencedata.facilities f"
-    
+/*** Filters to use programs, frequence, year, facility et product ***/
     
 
 
@@ -16,7 +13,7 @@
 {% set facility_name_list = filter_values('facility_name') | default([]) %}
 {% set product_name_list = filter_values('product_name') | default([]) %}
 
-{% macro avg_value() %}
+{% macro avg_value() %} --****** case with avg
 ,
 calculated_taux AS (
     SELECT 
@@ -25,7 +22,7 @@ calculated_taux AS (
         sq.frequence_name,
         sq.product_name,
         '{{filter_values('year_name')[0]}}' AS year_name,
-        (sq.quantity_expired::NUMERIC / rq.quantity_received::NUMERIC) AS taux_perte_intrats,--ROUND(((sq.quantity_expired::NUMERIC / rq.quantity_received::NUMERIC) * 100), 2) AS taux_perte_intrats,
+        (sq.quantity_expired::NUMERIC / rq.quantity_received::NUMERIC) AS taux_perte_intrats,
         sq.quantity_expired AS total_expired,
         rq.quantity_received AS total_received
     FROM 
@@ -41,15 +38,15 @@ SELECT
     '{{filter_values('frequence_name')[0]}}' AS frequence_name,                      
     'NAN' AS product_name,                        
     '{{filter_values('year_name')[0]}}' AS year_name,                          
-    ROUND((AVG(taux_perte_intrats)), 2) AS taux_perte_intrats, -- Average of taux_perte_intrats
-    ROUND((SUM(taux_perte_intrats)), 2) || ' / ' || COUNT(program_name) AS sur -- Summed sur values
+    ROUND((AVG(taux_perte_intrats)), 2) AS taux_perte_intrats, 
+    ROUND((SUM(taux_perte_intrats)), 2) || ' / ' || COUNT(program_name) AS sur 
 FROM 
     calculated_taux
 {% endmacro %}
  
  
 
-{% macro not_avg_value() %}
+{% macro not_avg_value() %} --****** case without avg
 SELECT 
     sq.program_name,
     sq.facility_name as facility_name,
@@ -162,7 +159,7 @@ received_quantities AS (
 {% if facility_name_list | length != 0 or product_name_list | length != 0 %}
  {{not_avg_value()}}
 {% else %}
---********** average case *****************
+
 {{avg_value()}}
 
 {% endif %}

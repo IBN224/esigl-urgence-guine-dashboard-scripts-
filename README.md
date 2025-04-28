@@ -36,6 +36,7 @@ See https://superset.apache.org/docs/installation/docker-compose for the steps.
     }
     
  ```
+ 3. Save the file and restart.
 
 
 

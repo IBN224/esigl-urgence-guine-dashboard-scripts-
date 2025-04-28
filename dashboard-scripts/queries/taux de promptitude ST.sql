@@ -1,5 +1,6 @@
 
 WITH nbre_rapport_soumi AS(
+--nombre de rapport saisis dan le delais
 SELECT COUNT(f1.id) as nbre_rapport_soumis,														
 						p.name as period_name,
 						pr.name as program_name,
@@ -24,6 +25,7 @@ SELECT COUNT(f1.id) as nbre_rapport_soumis,
    GROUP BY p.name, pr.name, f.name
 ),
 nbre_tt_rapport_attendu AS(
+--nombre total de rapport attendus
 SELECT COUNT(rq.id) as nbre_rapport_attendus,																			
 						f.name as facility_name
 	 FROM referencedata.supervisory_nodes s 																				

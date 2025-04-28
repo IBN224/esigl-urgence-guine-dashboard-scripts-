@@ -1,6 +1,7 @@
 
 
  WITH qt_produit_perime AS(
+--quantite de produit perimés
  WITH max_dates AS (
     SELECT s.lotid,
            h.id AS stock_id,
@@ -19,12 +20,6 @@
           p.name='VACCINS' AND
            --f.name IN () AND 
           -- o.fullproductname IN () AND
-          -- {% if current_year() != filter_values('year_name')[0] | int %}
-          --   DATE_TRUNC('year', l.expirationdate) = DATE_TRUNC('year', TO_DATE('{{filter_values('year_name')[0]}}'||'-01-01', 'YYYY-MM-DD')) 
-          -- {% endif %}
-          -- {% if current_year() == filter_values('year_name')[0] | int %}
-          --   DATE_TRUNC('{{ frequ_valu }}', l.expirationdate) = DATE_TRUNC('{{ frequ_valu }}', CURRENT_DATE)
-          -- {% endif %}
            DATE_TRUNC('year', l.expirationdate) = DATE_TRUNC('year', TO_DATE('2024-10-31', 'YYYY-MM-DD'))
           
 )
@@ -44,16 +39,9 @@ from (
 		WHERE row_num = 1) as result_1
 		JOIN stockmanagement.calculated_stocks_on_hand h ON h.id = result_1.stock_id
  GROUP BY program_name, facility_name, product_name
--- {% if (filter_values('product_name')[0] | default('') == '' and
---       filter_values('facility_name')[0] | default('') != '') or 
---       (filter_values('product_name')[0] | default('') != '' and
---       filter_values('facility_name')[0] | default('') == '') or
---       (filter_values('product_name')[0] | default('') != '' and
---       filter_values('facility_name')[0] | default('') != '')%}
---       ,facility_name, product_name
--- {% endif %}
 ),
 qt_produit_en_stock AS(
+--quantite total produit en stock
 WITH max_dates AS (
     SELECT s.lotid,
            h.id AS stock_id,
@@ -83,14 +71,6 @@ SELECT p.program_name as program_name,
        p.facility_name AS facility_name,
        p.product_name as product_name,
        p.frequence_name as frequence_name,
-      --   {% if filter_values('product_name')[0] | default('') != '' or 
-      --   filter_values('facility_name')[0] | default('') != '' %}
-      --   ROUND(((p.qt_produit_perimes::NUMERIC / r.qunatite_tt_produit_enStock) * 100), 2) AS taux_peremption,
-      -- {% endif %}
-      -- {% if filter_values('product_name')[0] | default('') == '' and 
-      --     filter_values('facility_name')[0] | default('') == '' %}
-      --     ROUND((p.qt_produit_perimes::NUMERIC / r.qunatite_tt_produit_enStock), 2) AS taux_peremption,
-      -- {% endif %}
        ROUND(((p.qt_produit_perimes::NUMERIC / r.qunatite_tt_produit_enStock) * 100), 2) AS taux_peremption,
        p.qt_produit_perimes || ' / ' || r.qunatite_tt_produit_enStock AS sur
       FROM qt_produit_perime p 

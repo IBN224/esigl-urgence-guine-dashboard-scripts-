@@ -1,20 +1,5 @@
---Filter columns product_name, period_name and frequence_name 
--- 1 product_name is the "SELECT o.fullproductname as product_name FROM referencedata.orderables o GROUP BY o.fullproductname";
 
--- 2 period_name is the "SELECT p.name as period_name
---  FROM referencedata.processing_periods p 
---        JOIN referencedata.processing_schedules s ON s.id=p.processingscheduleid
---  WHERE s.code!='Dayly' AND s.code!='Weekly' "
-
--- 3 frequence_name Values are dependent on period_name filter
---   here is the dataset "SELECT p.name as period_name,
---                             s.code as frequence_name
--- 	                   FROM referencedata.processing_periods p 
---                       JOIN referencedata.processing_schedules s ON s.id=p.processingscheduleid
---             		 JOIN (
---             			   SELECT p.startdate as startDate_border, p.enddate as endDate_border FROM referencedata.processing_periods p where p.name='{{filter_values('period_name')[0]}}' -- Jan-Fev,2022
---             			 ) as borderDates ON (borderDates.startDate_border<=p.startdate and borderDates.endDate_border>=p.enddate) "
-
+/*** Filters to use programs, frequence, year, period, facility et product ***/
 
 
 {% set frequ_valu = (
@@ -28,7 +13,7 @@
 {% set product_name_list = filter_values('product_name') | default([]) %}
 
 
-{% macro avg_value() %}
+{% macro avg_value() %} --****** case with avg
 ,
 calculated_taux AS (
     SELECT s.program_name as program_name,
@@ -51,14 +36,14 @@ SELECT
     '{{filter_values('frequence_name')[0]}}' AS frequence_name,                 
     '{{filter_values('year_name')[0]}}' AS year_name,                          
     ROUND((AVG(duree_moyen_rupture)), 2) AS duree_moyen_rupture, 
-    ROUND((SUM(duree_moyen_rupture)), 2) || ' / ' || COUNT(program_name) AS sur -- Summed sur values
+    ROUND((SUM(duree_moyen_rupture)), 2) || ' / ' || COUNT(program_name) AS sur 
 FROM 
     calculated_taux   
 {% endmacro %}
  
  
 
-{% macro not_avg_value() %}
+{% macro not_avg_value() %} --***** case without avg
 SELECT s.program_name as program_name,
        s.facility_name as facility_name,
        s.product_name as product_name,
@@ -143,14 +128,14 @@ SELECT COUNT(DISTINCT i.id) as nbre_tt_rupture,
   									  {% if current_year() == filter_values('year_name')[0] | int and 'Hebdomadaire' == filter_values('frequence_name')[0] %}
                         DATE_TRUNC('{{ frequ_valu }}', r.createddate) = DATE_TRUNC('{{ frequ_valu }}', CURRENT_DATE) AND
                       {% endif %}
-                      -- and finally if current_year() != 2024 or frequence != day; result is => default
+                     
   									  i.totalstockoutdays!=0
 						  GROUP BY pr.name, o.fullproductname
 )
 {% if facility_name_list | length != 0 or product_name_list | length != 0 %}
  {{not_avg_value()}}
 {% else %}
---********** average case *****************
+
 {{avg_value()}}
 
 {% endif %}

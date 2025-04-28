@@ -1,22 +1,5 @@
---Filter columns program_name, period_name and facility_name 
--- 1 program_name is the "SELECT p.name as program_name FROM referencedata.programs p";
 
--- 2 product_name is the "SELECT o.fullproductname as product_name FROM referencedata.orderables o GROUP BY o.fullproductname"
-
--- 3 frequence_name is the "SELECT *
---						   FROM (
---						       VALUES 
---						           (1, 'Hebdomadaire'),
---						           (2, 'Mensuelle'),
---						           (3, 'Trimestrielle'),
---						           (4, 'Annuelle')
---						   ) AS t(id, frequence_name);"
-
-
-
-      
-
-
+/*** Filters to use programs, frequence, year, facility et product ***/
 
 
 
@@ -31,7 +14,7 @@
 {% set product_name_list = filter_values('product_name') | default([]) %}
 
 
-{% macro avg_value() %}
+{% macro avg_value() %} --****** case with avg
 ,
 calculated_taux AS (
    SELECT p.frequence_name as frequence_name,
@@ -53,14 +36,14 @@ SELECT
     '{{filter_values('frequence_name')[0]}}' AS frequence_name,                 
     '{{filter_values('year_name')[0]}}' AS year_name,                          
     ROUND((AVG(taux_rupture_stock)), 2) AS taux_rupture_stock, 
-    ROUND((SUM(taux_rupture_stock)), 2) || ' / ' || COUNT(program_name) AS sur -- Summed sur values
+    ROUND((SUM(taux_rupture_stock)), 2) || ' / ' || COUNT(program_name) AS sur 
 FROM 
     calculated_taux   
 {% endmacro %}
  
  
 
-{% macro not_avg_value() %}
+{% macro not_avg_value() %} --****** case without avg
 SELECT p.frequence_name as frequence_name,
        p.program_name as program_name,
         p.product_name as product_name,
@@ -148,7 +131,7 @@ SELECT COUNT(DISTINCT o.id) as nbre_tt_produits,
 {% if facility_name_list | length != 0 or product_name_list | length != 0 %}
  {{not_avg_value()}}
 {% else %}
---********** average case *****************
+
 {{avg_value()}}
 
 {% endif %}

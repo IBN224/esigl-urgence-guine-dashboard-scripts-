@@ -1,16 +1,5 @@
---Filter columns frequence_name
--- frequence_name is the "SELECT *
---						   FROM (
---						       VALUES 
---						           (1, 'Hebdomadaire'),
---						           (2, 'Mensuelle'),
---						           (3, 'Trimestrielle'),
---						           (4, 'Annuelle')
---						   ) AS t(id, frequence_name);"
-
-
-
-
+						
+/*** Filters to use programs, frequence, year, facility et product ***/
 		
 
 {% set frequ_valu = (
@@ -46,19 +35,11 @@
            o.fullproductname IN ( {{ "'" + "','".join(filter_values('product_name', ['default_product1', 'default_product2'])) + "'" 
            if filter_values('product_name', []) else "'default_product1','default_product2'" }}))
           AND
-          -- {% if current_year() != filter_values('year_name')[0] | int %}
-          --  DATE_TRUNC('year', l.expirationdate) = DATE_TRUNC('year', TO_DATE('{{filter_values('year_name')[0]}}'||'-01-01', 'YYYY-MM-DD')) 
-          --{% endif %}
-          --{% if current_year() == filter_values('year_name')[0] | int %}
-          --  DATE_TRUNC('{{ frequ_valu }}', l.expirationdate) = DATE_TRUNC('{{ frequ_valu }}', CURRENT_DATE)
-          --{% endif %}
            DATE_TRUNC('{{ frequ_valu }}', l.expirationdate) = DATE_TRUNC('{{ frequ_valu }}', CURRENT_DATE)
           
 )
 SELECT SUM(h.stockonhand) as qt_produit_perimes,
        program_name as program_name,
-       --facility_name as facility_name,
-       --product_name as product_name,
        {% if filter_values('product_name')[0] | default('') == '' and 
             filter_values('facility_name')[0] | default('') == '' %}
         'NAN' as product_name,
@@ -84,7 +65,7 @@ from (
 		FROM max_dates
 		WHERE row_num = 1) as result_1
 		JOIN stockmanagement.calculated_stocks_on_hand h ON h.id = result_1.stock_id
- GROUP BY program_name--, facility_name, product_name
+ GROUP BY program_name
  {% if (filter_values('product_name')[0] | default('') == '' and
       filter_values('facility_name')[0] | default('') != '') or 
       (filter_values('product_name')[0] | default('') != '' and
@@ -132,7 +113,6 @@ SELECT p.program_name as program_name,
            filter_values('facility_name')[0] | default('') == '' %}
            ROUND((p.qt_produit_perimes::NUMERIC / r.qunatite_tt_produit_enStock), 2) AS taux_peremption,
        {% endif %}
-       --ROUND(((p.qt_produit_perimes::NUMERIC / r.qunatite_tt_produit_enStock) * 100), 2) AS taux_peremption,
        p.qt_produit_perimes || ' / ' || r.qunatite_tt_produit_enStock AS sur
       FROM qt_produit_perime p 
       JOIN qt_produit_en_stock r ON p.frequence_name=r.frequence_name

@@ -1,10 +1,5 @@
---Filter columns program_name, period_name and facility_name 
--- 1 program_name is the "SELECT p.name as program_name FROM referencedata.programs p";
 
--- 2 period_name is the "SELECT p.name as period_name from referencedata.processing_periods p"
-
--- 3 facility_name is the "SELECT f.name as facility_name FROM referencedata.facilities f"
-
+/*** Filters to use programs, frequence, period et facility ***/
 
 
 
@@ -49,7 +44,6 @@ WITH nbre_rapport_soumi AS(
 SELECT COUNT(f1.id) as nbre_rapport_soumis,														
 						p.name as period_name,
 						pr.name as program_name,
-						--f.name as facility_name
 						{{ check_facility_type() }} as facility_name
 	FROM  requisition.requisitions r 
 					JOIN referencedata.programs pr ON r.programid=pr.id
@@ -62,19 +56,16 @@ SELECT COUNT(f1.id) as nbre_rapport_soumis,
 					JOIN referencedata.facility_types t ON f1.typeid=t.id
    WHERE p.name='{{filter_values('period_name')[0]}}' AND 
  		     pr.name='{{filter_values('program_name')[0]}}' AND
-         --f.name='BOKE' AND
-         --f1.name='CSR KOLABOUI' AND
          {{ check_facility_type_where() }}
          AND
     		 (t.code='CENTRE DE SANTE' OR t.code='HOPITAL PREFECTORAL/CMC') AND   --t.code!='warehouse'
     		 r.facilityid=f1.id  AND
     		 (r.status='APPROVED' OR r.status='AUTHORIZED')
-   GROUP BY p.name, pr.name,--f.name
+   GROUP BY p.name, pr.name,
          {{ check_facility_type() }}
 ),
 nbre_tt_rapport_attendu AS(
-SELECT COUNT(rq.id) as nbre_rapport_attendus,																			
-						--f.name as facility_name
+SELECT COUNT(rq.id) as nbre_rapport_attendus,	
 						{{ check_facility_type() }} as facility_name
 	 FROM referencedata.supervisory_nodes s 																				
 	             JOIN referencedata.facilities f ON s.facilityid=f.id
@@ -82,9 +73,9 @@ SELECT COUNT(rq.id) as nbre_rapport_attendus,
 	             JOIN referencedata.requisition_group_members rm ON rm.requisitiongroupid=rq.id
 				 JOIN referencedata.facilities f1 ON f1.id=rm.facilityid
 				 JOIN referencedata.facility_types t ON f1.typeid=t.id
-	WHERE {{ check_facility_type_where() }}--f.name='BOKE' AND
+	WHERE {{ check_facility_type_where() }}
        AND (t.code='CENTRE DE SANTE' OR t.code='HOPITAL PREFECTORAL/CMC')  --t.code!='warehouse'
-	GROUP BY {{ check_facility_type() }} --f.name
+	GROUP BY {{ check_facility_type() }}
 	   
 )
 SELECT p.period_name as period_name,

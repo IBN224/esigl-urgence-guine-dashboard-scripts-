@@ -191,8 +191,8 @@ SELECT
     'year' AS frequence_name,                      
     'NAN' AS product_name,                        
     '2023' AS year_name,                          
-    ROUND((AVG(taux_perte_intrats)), 2) AS taux_perte_intrats, -- Average of taux_perte_intrats
-    SUM(total_expired) || ' / ' || SUM(total_received) AS sur -- Summed sur values
+    ROUND((AVG(taux_perte_intrats)), 2) AS taux_perte_intrats, 
+    SUM(total_expired) || ' / ' || SUM(total_received) AS sur 
 FROM 
     calculated_taux
     
