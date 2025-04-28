@@ -1,10 +1,44 @@
-# OpenLMIS Deployment Provisioning and Environments
-This repository contains how-tos and scripts for provisioning and deployment of OpenLMIS v3.  The specific scripts here
-are actively utilized to for specific automated deployments, which we hope also form a basis for implementers to use as a template.
+# Superset Deployment using Docker Compose
+See https://superset.apache.org/docs/installation/docker-compose for the steps.
 
-## Contents
+## in superset_config.py file add the following lines
 
-* [Recommended Topology](deploymentTopology.md)
-* [Provisioning](provision/README.md)
-* [Deployment](deployment/README.md)
-* [Monitoring](monitoring/README.md)
+1. To be able to use SQL Templating ENABLE_TEMPLATE_PROCESSING feature flag needs to be enabled in superset_config.py
+ for more see https://superset.apache.org/docs/configuration/sql-templating/#jinja-templates
+
+ add this line inside FEATURE_FLAGS
+ ```
+   "ENABLE_TEMPLATE_PROCESSING":True
+ ```
+
+ and it should look like this
+
+  FEATURE_FLAGS = {
+    "ALERT_REPORTS": True, 
+    "ENABLE_TEMPLATE_PROCESSING":True
+  }
+
+ 2. add these lines for the current year and month
+  
+ ```
+    from datetime import datetime
+
+    def current_year():
+        return datetime.now().year
+
+    def current_month():
+        return datetime.now().month
+
+    # Add custom Jinja context
+    JINJA_CONTEXT_ADDONS = {
+        "current_year": current_year,
+        "current_month": current_month,
+    }
+    
+ ```
+
+
+
+
+
+
