@@ -38,8 +38,32 @@ See https://superset.apache.org/docs/installation/docker-compose for the steps.
  ```
  3. Save the file and restart.
 
+# Steps To deploy dashboard in Superset
 
+## First deploy all the filters and then queries, dataset
 
+1. Create a query then save & go to dataset see the screenshot
 
+  ![alt text](<Screenshot 2025-05-13 133056.png>)
+
+2. Save dateset & go to chart see the screenshot
+
+  ![alt text](<Screenshot 2025-05-13 133606-1.png>)
+
+  ![alt text](<Screenshot 2025-05-13 134010-1.png>)
+
+  ![alt text](<Screenshot 2025-05-13 134109-1.png>)
+
+3. And Save chart & go to dashboard screenshot
+
+  ![alt text](<Screenshot 2025-05-13 134308-1.png>)
+
+4. for the filter 
+
+  ![alt text](<Screenshot 2025-05-13 140017-1.png>)
+
+### For more details see https://superset.apache.org/docs/using-superset/creating-your-first-dashboard
+
+ 
 
 
