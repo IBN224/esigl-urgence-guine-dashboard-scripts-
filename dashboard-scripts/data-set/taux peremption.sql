@@ -2,6 +2,7 @@
 /*** Filters to use programs, frequence, year, facility et product ***/
 		
 
+
 {% set frequ_valu = (
     'day' if filter_values('frequence_name')[0] == 'Hebdomadaire' else
     'month' if filter_values('frequence_name')[0] == 'Mensuelle' else
@@ -35,7 +36,13 @@
            o.fullproductname IN ( {{ "'" + "','".join(filter_values('product_name', ['default_product1', 'default_product2'])) + "'" 
            if filter_values('product_name', []) else "'default_product1','default_product2'" }}))
           AND
-           DATE_TRUNC('{{ frequ_valu }}', l.expirationdate) = DATE_TRUNC('{{ frequ_valu }}', CURRENT_DATE)
+           {% if current_year() != filter_values('year_name')[0] | int %}
+            DATE_TRUNC('year', l.expirationdate) = DATE_TRUNC('year', TO_DATE('{{filter_values('year_name')[0]}}'||'-01-01', 'YYYY-MM-DD')) 
+           {% endif %}
+           {% if current_year() == filter_values('year_name')[0] | int %}
+            DATE_TRUNC('{{ frequ_valu }}', l.expirationdate) = DATE_TRUNC('{{ frequ_valu }}', CURRENT_DATE)
+           {% endif %}
+           
           
 )
 SELECT SUM(h.stockonhand) as qt_produit_perimes,
@@ -65,7 +72,7 @@ from (
 		FROM max_dates
 		WHERE row_num = 1) as result_1
 		JOIN stockmanagement.calculated_stocks_on_hand h ON h.id = result_1.stock_id
- GROUP BY program_name
+ GROUP BY program_name--, facility_name, product_name
  {% if (filter_values('product_name')[0] | default('') == '' and
       filter_values('facility_name')[0] | default('') != '') or 
       (filter_values('product_name')[0] | default('') != '' and
@@ -122,9 +129,6 @@ SELECT p.program_name as program_name,
 
 		
 		
-		
-		
-			
 		
 		
 		

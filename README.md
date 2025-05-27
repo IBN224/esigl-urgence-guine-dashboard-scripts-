@@ -64,6 +64,14 @@ See https://superset.apache.org/docs/installation/docker-compose for the steps.
 
 ### For more details see https://superset.apache.org/docs/using-superset/creating-your-first-dashboard
 
+
+### NB Superset version issue: The current version in the production server is 1.5.2.
+
+A) If you are using the 1.5.2 version to deploy a dashboard, you must follow the following steps:
+- First, you cannot follow the above steps to create a dashboard as query -> dataset -> chart -> dashboard.
+- - Generate a dataset from one schema of the database.
+- - Edit the dataset and save it.
+- - Pass the dataset to the chart and chart to dashboard.
  
 
 
